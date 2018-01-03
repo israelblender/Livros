@@ -37,7 +37,7 @@ class Books(DatabaseBooks):
 if __name__ == "__main__":
     b = Books()
 
-    days = 365
+    days = 362
     totalBooks = b.getTotalBooks()
     totalPages = b.getTotalPages()
     totalPagesReads = b.getTotalPagesReads()
@@ -52,4 +52,5 @@ if __name__ == "__main__":
     Média de páginas em cada livro: \t{:.0f}
     Leia {} páginas por dia em {} dias.""".format(
     totalBooks, totalPages, totalPagesReads, totalPagesNotReads, totalPages/totalBooks, int(mediaPagesDay), days))
-    input("\n\nPrecione qualquer tecla para sair")
+    try: input("\n\nPrecione qualquer tecla para sair")
+    except: pass
