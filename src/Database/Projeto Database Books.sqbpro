@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="H:/Projetos/Desenvolvimento/Livros/src/Database/Books.db" foreign_keys="1"/><window><current_tab id="1"/></window><tab_structure><column_width id="0" width="165"/><column_width id="1" width="0"/><column_width id="2" width="40"/><column_width id="3" width="1154"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="livros"/><default_encoding codec=""/><browsetable_info data="AAAAAgAAAAwAbABpAHYAcgBvAHMAAAADAAAAAQAAAAEAAAACAAABwgAAAAEAAAABAAAAAAAAAAAA/////wAAAA4AXwByAG8AdwBpAGQAXwAAAAIAAAAaAHQAbwB0AGEAbABfAHAAYQBnAGkAbgBhAHMAAAABAAAABQH//zExQEAEBAAAAAAAHABpAG4AaQBjAGkAbwBfAGwAZQBpAHQAdQByAGEAAAABAAAABQH//4ODysr//wAA/////wAAABIAYQBuAG8AdABhAGMAbwBlAHMAAAAGAAAAAQAAAAMAAAAGAAAA7wAAAAQAAACUAAAAAgAAALgAAAAAAAAAAAD//////////wAAAAD/////"/></tab_browse><tab_sql><sql name="SQL 1">--update livros set pagina_pausada=inicio_leitura where pagina_pausada=0
-
-
-select * from pages
-
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="H:/Projetos/Desenvolvendo/Livros/src/Database/Books.db" foreign_keys="1"/><window><current_tab id="1"/></window><tab_structure><column_width id="0" width="165"/><column_width id="1" width="0"/><column_width id="2" width="40"/><column_width id="3" width="1154"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="livros"/><default_encoding codec=""/><browsetable_info data="AAAAAgAAAAwAbABpAHYAcgBvAHMAAAAEAAAAAQAAAAEAAAACAAABwgAAAAYAAAAFAAAAAAAAAAQAAAAAAAAAAwAAAAAAAAACAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAP////8AAAAOAF8AcgBvAHcAaQBkAF8AAAACAAAAGgB0AG8AdABhAGwAXwBwAGEAZwBpAG4AYQBzAAAAAQAAAAUB//8xMUBABAQAAAAAABwAaQBuAGkAYwBpAG8AXwBsAGUAaQB0AHUAcgBhAAAAAQAAAAUB//+Dg8rK//8AAP////8AAAASAGEAbgBvAHQAYQBjAG8AZQBzAAAABgAAAAEAAAADAAAABgAAAO8AAAAEAAAAlAAAAAIAAAC4AAAAAAAAAAAA//////////8AAAAA/////w=="/></tab_browse><tab_sql><sql name="SQL 1">update livros set pagina_pausada=inicio_leitura where pagina_pausada=0
+
+
+--select * from pages
+
 </sql><sql name="SQL 2">CREATE VIEW pages AS select total_paginas, pagina_pausada from livros order by total_paginas DESC</sql><current_tab id="0"/></tab_sql></sqlb_project>
