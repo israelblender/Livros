@@ -1,6 +1,7 @@
 # -*- coding: Latin-1 -*-
 
 from Database import DatabaseBooks
+import datetime
 
 class Books(DatabaseBooks):
     def __init__(self):
@@ -36,13 +37,16 @@ class Books(DatabaseBooks):
 
 if __name__ == "__main__":
     b = Books()
-
-    days = 362
+    
+    dt_final = datetime.date(2018, 12, 31)
+    days_rest = dt_final - dt_final.today()
+    days_rest = days_rest.days
+    
     totalBooks = b.getTotalBooks()
     totalPages = b.getTotalPages()
     totalPagesReads = b.getTotalPagesReads()
     totalPagesNotReads = b.getTotalPagesNotReads()
-    mediaPagesDay = b.getMediaPagesDay(totalPagesNotReads, days)
+    mediaPagesDay = b.getMediaPagesDay(totalPagesNotReads, days_rest)
     
     print ("""
     Total de livros: \t\t\t{}

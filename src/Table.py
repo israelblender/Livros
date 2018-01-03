@@ -16,30 +16,35 @@ class Table(object, tk.Frame):
         #print headers
         self.headers = headers
         self.infoSizeCols = dict(headers)
-        
-        self.insertLine(headers, "header")
+        self.dict_headers = {}
+        for index, elem in enumerate(headers):
+            self.dict_headers[index] = elem[0]
+        self.insertLine(self.dict_headers, "header")
         
     
     def insertRow(self, elements):
-        if len(elements[0]) != len(self.infoSizeCols):
+        #print elements, self.infoSizeCols
+        if len(elements) != len(self.infoSizeCols):
             raise Exception("Erro", u"A quantidade de elementos informados nao e igual a quantidade registrada!")
         return self.insertLine(elements, "cel")
 
     def insertLine(self, elements, type):
         if type=="header": #recebe lista de dois elementos em cada elemento
+            print elements
             self._insertCelulasByElement(elements)
-        elif type=="cel":#recebe uma lista com apenas 
+        elif type=="cel": #recebe uma lista com apenas
             self._insertCelulasByElement(elements, relief=tk.GROOVE)
         self.row += 1
         
     def _insertCelulasByElement(self, elements, **kwargs):
         col = 0
+        
         for elem in elements:
-            self._insertCelula(row=self.row, col=col, width=self.infoSizeCols.get(col_name), value=elements.get(col_name), **kwargs)
+            self._insertCelula(row=self.row, col=col, width=self.infoSizeCols.get(elem), value=elements.get(elem), **kwargs)
             col += 1
         
     def _insertCelula(self, row, col, width, value="", **cnf):
-        print "\n", row, col, width, value#, type(row), type(col), type(width), type(value)
+        #print "\n", row, col, width, value#, type(row), type(col), type(width), type(value)
         cel = tk.Label(self, width=width, text=value, cnf=cnf)
         cel.grid(row=row, column=col)
         return cel
@@ -53,7 +58,7 @@ if __name__ == "__main__":
     window.geometry("700x400+250+150")
     
     #gui = Table(window, ("id", 8),("nome", 30),("idade", 10))
-    gui = Table(window, {"id": 8, "nome": 30, "idade":10})
+    gui = Table(window, (("id", 8), ("nome", 30), ("idade",10)))
     
     gui.insertRow({"id": "5", "nome": "Alguma pessoa", "idade":"18"})
     gui.insertRow({"id": "12", "nome": "Fulano", "idade":"15"})
