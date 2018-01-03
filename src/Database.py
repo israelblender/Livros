@@ -90,7 +90,6 @@ class TestStringMethods(unittest.TestCase):
 	    
 if __name__ == "__main__":
     unittest.main()
-    
     #db = DatabaseBooks()
     #test(db.getRecords(0))
     #print sys._getframe(1).f_lineno
