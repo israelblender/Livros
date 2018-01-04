@@ -10,7 +10,8 @@ class Books(DatabaseBooks):
         self.books = self.getRecords()
         self._totalPages = None
         self._totalPagesNotReads = None
-
+    def getAllBooks(self):
+        return self.books
     def getTotalPagesReads(self):
         if not self._totalPages: self._totalPages = self.getTotalPages()
         if not self._totalPagesNotReads: self.getTotalPagesNotReads()
@@ -55,6 +56,6 @@ if __name__ == "__main__":
     Total de páginas não lidas: \t{}
     Média de páginas em cada livro: \t{:.0f}
     Leia {} páginas por dia em {} dias.""".format(
-    totalBooks, totalPages, totalPagesReads, totalPagesNotReads, totalPages/totalBooks, int(mediaPagesDay), days))
+    totalBooks, totalPages, totalPagesReads, totalPagesNotReads, totalPages/totalBooks, int(mediaPagesDay), days_rest))
     try: input("\n\nPrecione qualquer tecla para sair")
     except: pass
