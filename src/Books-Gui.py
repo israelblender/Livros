@@ -1,10 +1,11 @@
 # -*- coding: Latin-1 -*-
 
 #import Tkinter as tk
-from Tkinter import Frame, Tk, LEFT, Label, W, E, StringVar
+from Tkinter import Frame, Tk, LEFT, TOP, BOTTOM, Label, W, E, StringVar, Button
 from Books import Books
 from Table import Table
 from datetime import date
+from collections import namedtuple
 
 class PanelInfo:
 
@@ -12,7 +13,7 @@ class PanelInfo:
         self.frameInfo = Frame(master)
         self.frameInfo.pack(side=LEFT)
         
-        self.books = Books()
+        self.book = Books()
         
         self.totalBooksVar = StringVar()
         self.totalPagesVar = StringVar()
@@ -38,21 +39,47 @@ class PanelInfo:
         
         self.setDatas()
         
-        self.frameTable = Frame(master)
+        self.frameTableOptions = Frame(master)
+        self.frameTableOptions.pack(expand=True, fill="both")
         
-        self.frameTable.pack(side=LEFT)
+        self.table = table = Table(self.frameTableOptions, (("nome do livro", 50), ("total paginas", 10), ("pagina pausada", 10), ("inicio leitura", 10)))
+        table.bindLine("<Button-1>", table.selectRow)
+        table.pack(side=TOP, padx=5, pady=5, expand=True, fill="both")
+        self.setDatasTable()#Funcao para inserir as linhas de acordo com os dados do self.book.getRecords
+        table._updateRegion()
+        
+        self.frameOptions = Frame(self.frameTableOptions, background="#B4CDCD")
+        self.frameOptions.pack(side=BOTTOM, fill="both", padx=5, pady=5)
+        Button(self.frameOptions, text="Alterar dados", command=self.actionWindowEdit).pack(side=LEFT, padx=5, pady=5)
+        
+    def setDatasTable(self):
+        Records = namedtuple("Records", "id, nome, total_paginas, pagina_pausada, inicio_leitura")
+        for element in map(Records._make, self.book.getRecords()):
+            self.table.insertRow(element.id, \
+                {"nome do livro":element.nome.encode("Latin-1"),
+                "total paginas":str(element.total_paginas),
+                "pagina pausada":str(element.pagina_pausada),
+                "inicio leitura":str(element.inicio_leitura)})
+                
+            #print element.id, element.nome.encode("Latin-1"), element.total_paginas
+    
+    def actionWindowEdit(self):
+        id_line_selected = self.table.getIdSelected()
+        if id_line_selected:
+            print "ActionWindowEdit"
+        else: print "Id not selected"
         
     def setDatas(self):
         dt_final = date(2018, 12, 31)
         days_rest = dt_final - dt_final.today()
         days_rest = days_rest.days
         
-        totalBooks = self.books.getTotalBooks()
-        totalPages = self.books.getTotalPages()
-        totalPagesReads = self.books.getTotalPagesReads()
-        totalPagesNotReads = self.books.getTotalPagesNotReads()
+        totalBooks = self.book.getTotalBooks()
+        totalPages = self.book.getTotalPages()
+        totalPagesReads = self.book.getTotalPagesReads()
+        totalPagesNotReads = self.book.getTotalPagesNotReads()
         self.daysRestVar.set("Páginas para ler por dia durante {} dias:".format(days_rest))
-        mediaPagesDay = self.books.getMediaPagesDay(totalPagesNotReads, days_rest)
+        mediaPagesDay = self.book.getMediaPagesDay(totalPagesNotReads, days_rest)
         
         self.totalBooksVar.set(totalBooks)
         self.totalPagesVar.set(totalPages)
@@ -69,17 +96,20 @@ class Gui(object, Frame):
     
     def __init__(self, master):
         Frame.__init__(self, master)
+        
         pf = PanelInfo(master)
+        
+        
         
         #print pf.setDatas
         pass
 if __name__  == "__main__":
     window = Tk()
     window.title("Gerenciador de livros")
-    window.geometry("700x400+250+150")
-    window.resizable(False, False)
+    window.geometry("900x400+250+150")
+    #window.resizable(False, False)
     
     gui = Gui(window)
-    gui.pack()
+    gui.pack(fill="x")
 
     window.mainloop()

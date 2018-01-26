@@ -1,6 +1,6 @@
 # -*- coding: Latin-1 -*-
 import sqlite3
-import unittest
+import os
 
 class DatabaseBooks(object):
     def __new__(self):
@@ -8,6 +8,7 @@ class DatabaseBooks(object):
         return self._instance
     
     def __init__(self):
+        print os.getcwd()
         self.db = sqlite3.connect("Database/Books.db")
         self.cursor = self.db.cursor()
         self._createDatabase()
@@ -51,48 +52,12 @@ class DatabaseBooks(object):
         self.db.close()
 
 
-class TestStringMethods(unittest.TestCase):
 
-    def test_database_create(self):
-        self.db = DatabaseBooks()
-        self.assertTrue(self.db._createDatabase())
-        print "Processo de criação de banco de dados funcionando"
-        
-    def test_records(self):
-        self.db = DatabaseBooks()
-        self.assertTrue(self.db.getRecords())
-
-    def test_size(self):
-        self.db = DatabaseBooks()
-        self.assertEqual(43, self.db.getSizeRecords())
-        print "O banco de dados assume 43 registros como esperado"
-        
-    def test_field(self):
-        self.db = DatabaseBooks()
-        self.assertEqual(u'marketing na era digital'.lower(), self.db.getRecords(id_record=26)[1])
-        print "O livro com id 26 foi testado e foi retornado com sucesso"
-
-    def test_create_book(self):
-        testar = False
-        if testar:
-            self.db = DatabaseBooks()
-            self.assertTrue(self.db.createRecord("Meu livro", 420, 12))
-            print "O metodo createRecord criou registro 'Meu livro' com sucesso"
-        else: print "Teste de criação de livro não realizado"
-        
-
-    def test_split(self):
-        s = 'hello world'
-        self.assertEqual(s.split(), ['hello', 'world'])
-        # check that s.split fails when the separator is not a string
-        #with self.assertRaises(TypeError):
-            #s.split(2)
 	    
 if __name__ == "__main__":
-    unittest.main()
-    #db = DatabaseBooks()
-    #test(db.getRecords(0))
+    db = DatabaseBooks()
+    
     #print sys._getframe(1).f_lineno
     
-    #print ("Conexão bem sucessida")
+    print ("Conexão bem sucessida")
     #print ("{} registros encontrados.".format(len(db.getRecords())))

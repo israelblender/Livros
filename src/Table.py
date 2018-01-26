@@ -9,8 +9,25 @@ class Table(object, tk.Frame):
     def __new__(cls, *args, **kwargs):
         return super(Table, cls).__new__(cls, *args, **kwargs)
 
-    def __init__(self, master, headers):
-        tk.Frame.__init__(self, master)
+    def __init__(self, master, headers, **kwargs):
+        tk.Frame.__init__(self, master, cnf=kwargs)
+        frameCanvasScrolly = tk.Frame(self)
+        frameCanvasScrolly.pack(side=tk.TOP, fill="both", expand=True)
+        self.canvas = canvas = tk.Canvas(frameCanvasScrolly, scrollregion=(0, 0, 1100, 1000), background="#CAE1FF")
+        canvas.pack(side=tk.LEFT, fill="both", expand=True)
+        
+        self.frameCelulas = tk.Frame(canvas)
+        canvas.create_window(0, 0, window=self.frameCelulas, anchor=tk.NW)
+
+        scrolly = tk.Scrollbar(frameCanvasScrolly, orient=tk.VERTICAL, command=canvas.yview)
+        scrolly.pack(side=tk.LEFT, fill="y")
+        #scrolly.grid(row=0, column=1)
+        canvas['yscrollcommand'] = scrolly.set
+        
+        scrollx = tk.Scrollbar(self, orient=tk.HORIZONTAL, command=canvas.xview)
+        scrollx.pack(side=tk.TOP, fill="x")
+        canvas['xscrollcommand'] = scrollx.set
+        
         self.master = master
         self.row = 0
         #self._bindStringDict = {}#1: "<Button-1>", 2: "<Button-2>", 3: "<Button-3>"}
@@ -20,7 +37,10 @@ class Table(object, tk.Frame):
 
         self.configColors(bg="#B4CDCD", bg_header="#68838B")
         self.configHeader(headers)
-        
+        self._unique_id_selected = None
+    def configSize(self, width, height):
+        self.config(width=width, height=height)#Muda tamanho do frame Table
+        #self.canvas.config(width=width, height=height)
     
     def configHeader(self, headers):
         self.headers = headers
@@ -33,11 +53,8 @@ class Table(object, tk.Frame):
     def configColors(self, bg, bg_header):
         self._colorBgPatern = bg
         self._colorBgHeader = bg_header
-        
     
     def insertRow(self, unique_id, elements):
-        
-        #print elements, self.infoSizeCols
         if len(elements) != len(self.infoSizeCols):
             raise Exception("Erro", u"A quantidade de elementos informados nao e igual a quantidade registrada!")
         return self.insertLine(unique_id, elements, "cel")
@@ -45,6 +62,10 @@ class Table(object, tk.Frame):
     def insertLine(self, unique_id, elements, type):
         self._insertCelulasByElement(unique_id, elements, type)
         self.row += 1
+    
+    def _updateRegion(self):#Atualiza a região para que o scroll se encaixe no quadro da tabela
+        self.frameCelulas.update()
+        self.canvas.config(scrollregion=(0, 0, self.frameCelulas.winfo_width(), self.frameCelulas.winfo_height()))
         
     def _insertCelulasByElement(self, unique_id, cols_values, type):
         col = 0
@@ -67,23 +88,17 @@ class Table(object, tk.Frame):
                         value = self.dict_headers.get(index),
                         relief=tk.GROOVE,
                         background=self._colorBgHeader)
-                
                 col += 1
     
-
-            
     #def _bindFunction(self, events):
         #print events.char, events.delta, events.height, events.keycode, events.keysym, events.keysym_num, events.num, events.send_event, events.serial, events.state, events.time, events.type, events.widget, events.width, events.x, events.x_root, events.y, events.y_root
             
     def _insertCelula(self, row, col, unique_id, width, value="", **cnf):
-        #print "\n", row, col, width, value#, type(row), type(col), type(width), type(value)
-        cel = tk.Label(self, width=width, text=value, cnf=cnf)
+        cel = tk.Label(self.frameCelulas, width=width, text=value, cnf=cnf)
         cel.grid(row=row, column=col)
         cel.unique_id = unique_id
         return cel
-    
-    #def bindLine(self, str_type, function):
-        #self.bindList[str_type] = function#Adiciona o bind a lista de binds
+
     def _addBinds(self, celula):
         for bindKeyStr in self.bindLine.dictFunctions:
             celula.bind(bindKeyStr, self.bindLine.dictFunctions.get(bindKeyStr))
@@ -94,22 +109,23 @@ class Table(object, tk.Frame):
 		self.string = string
 		self.myFunction = myFunction
 		self.dictFunctions[string] = self._funcao
-
+                
 	def _funcao(self, events):
 		unique_id = events.widget.unique_id
-                print events, unique_id
+                #print events, unique_id
 		self.myFunction(events, unique_id)
-                
-        #def functionsByString(self, string):
-            #return dictFunctions.get(string)
         
     def selectRow(self, events, unique_id):
         self._unique_id_selected = unique_id#events.widget.unique_id
         widget = events.widget
-        widgetsInLine = widget.grid_info().get("in").grid_slaves(row=int(widget.grid_info().get("row")))
-        
+        self.selectRowByNumberLine(widget = widget, line = int(widget.grid_info().get("row")) )
+            
+    def selectRowByNumberLine(self, widget, line):
+        widgetsInLine = widget.grid_info().get("in").grid_slaves(row=line)
         self._diselectLastWidgets()#Se nao for a primeira selecao, diselecione os ultimos widgets selecionados
         self.selectWidgets(widgetsInLine)
+        
+    
     def getIdSelected(self):#Retorna o id retornado por selectRow
         return self._unique_id_selected
         
@@ -123,12 +139,12 @@ class Table(object, tk.Frame):
             for widget in self._lastWidgetsSelecteds:
                 widget.config(background=self._colorBgPatern)
 
-
-
 if __name__ == "__main__":
     global datas_
     def action():
-        gui.configHeader((("numero", 15), ("nome completo", 40), ("idade",10)))
+        table.configHeader((("numero", 15), ("nome completo", 40), ("idade",10)))
+    def actionChangeCanvasSize():
+        table.configSize(100, 700)
 
     def windowEdit(master, unique_id):
         global nomeVar, idadeVar
@@ -145,45 +161,56 @@ if __name__ == "__main__":
         idadeVar = tk.StringVar()
         tk.Label(frame, text="Idade").grid(row=1, column=0)
         tk.Entry(frame, textvariable=idadeVar).grid(row=1, column=1)
-
         setDatas(unique_id)
         
     def setDatas(unique_id):
-        
-        data = datas_.get(str(unique_id))
-        print "DATA {}".format(data)
-        
+        data = datas_.get(str(unique_id))        
         nomeVar.set(data.get("nome"))
         idadeVar.set(data.get("idade"))
         
     def callWindowEdit(events, unique_id):
-        #unique_id = events.widget.unique_id
-        print "callWindowEdit Chamado"
-        windowEdit(window, gui.getIdSelected())
-        
+        #print "callWindowEdit Chamado"
+        windowEdit(window, table.getIdSelected())
         
     window = tk.Tk()
     window.title("Tabela")
-    window.geometry("700x400+250+150")
-    gui = Table(window, (("id", 8), ("nome", 40), ("idade",10)))
+    window.geometry("1050x550+250+100")
+    table = Table(window, (("id", 8), ("nome", 40), ("idade",10)), background="green", relief=tk.RIDGE)
     
-    gui.bindLine("<Button-1>", gui.selectRow)
-    gui.bindLine("<Button-3>", callWindowEdit)
+    table.bindLine("<Button-1>", table.selectRow)
+    table.bindLine("<Button-3>", callWindowEdit)
     
-    gui.insertRow(unique_id=5, elements={"id": "5", "nome": "Alguma pessoa", "idade":"18"})
-    gui.insertRow(unique_id=12, elements={"id": "12", "nome": "Fulano", "idade":"15"})
-    gui.insertRow(unique_id=14, elements={"id": "14", "nome": "Ciclano", "idade":"22"})
-    gui.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=5, elements={"id": "5", "nome": "Alguma pessoa", "idade":"18"})
+    table.insertRow(unique_id=12, elements={"id": "12", "nome": "Fulano", "idade":"15"})
+    table.insertRow(unique_id=14, elements={"id": "14", "nome": "Ciclano", "idade":"22"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18", "nome": "Beltrano", "idade":"26"})
+    
 
     datas_ ={"5":{"nome": "Alguma pessoa", "idade":"18"},
     "12":{"nome": "Fulano", "idade":"15"},
     "14":{"nome": "Ciclano", "idade":"22"},
     "18":{"nome": "Beltrano", "idade":"26"}}
+        
+    table.pack(fill="both", expand=True, padx=10, pady=10)
 
     
-    
-        
-    gui.pack(side=tk.TOP, expand=True)
-    
     tk.Button(window, text="Change Header", command=action).pack()
+    tk.Button(window, text="Change Size Canvas", command=actionChangeCanvasSize).pack()
     window.mainloop()
