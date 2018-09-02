@@ -177,7 +177,7 @@ class PanelTable:
         table.bind("<MouseWheel>", table.mouseWheelEvent, action="wheel")   
         table.pack(side=TOP, padx=5, pady=5, expand=True, fill="both")
         
-        self.setDatasTable()#Funcao para inserir as linhas de acordo com os dados do self.book.getRecords
+        self.setDatasTable()#Funcao para inserir as linhas de acordo com os dados do self.book.getRecordsDb
         table.updateRegion()
         table.selectRowByNumberLine(row=1)
     
@@ -190,7 +190,7 @@ class PanelTable:
     def setDatasTable(self):#inserte as linbhas na tabela
         "Inputa todas as linhas do banco de dados na tabela"
         Records = namedtuple("Records", "id, nome, total_paginas, pagina_pausada, inicio_leitura")
-        for element in map(Records._make, self.book.getRecords()):
+        for element in map(Records._make, self.book.getAllBooks(columns_str="id, nome, total_paginas, pagina_pausada, inicio_leitura")):
             self.table.insertRow(element.id, \
                 {"namebook":element.nome.encode("Latin-1"),
                 "totalpages":str(element.total_paginas),

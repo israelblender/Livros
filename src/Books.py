@@ -8,13 +8,16 @@ class Books(DatabaseBooks):
     def __init__(self):
         super(Books, self).__init__()
         #self.db = DatabaseBooks()
-        self.books = self.getRecordsDb()
         self._totalPages = None
         self._totalPagesNotReads = None
 
-    def getAllBooks(self):
-        "Retorna a informacao completa de cada livro"
-        return self.books
+    def getAllBooks(self, columns_str):
+        "Retorna a informacao completa de todos os livros"
+        return self.getRecordsDb(columns_str=columns_str)
+
+    def getBook(self, columns_str, id_record):
+        "Retorna a informacao completa dolivro"
+        return self.getRecordsDb(columns_str=columns_str, id_record=id_record)
 
     def getTotalPagesReads(self):
         "Retorna o total de paginas lidas"

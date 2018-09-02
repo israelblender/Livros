@@ -35,14 +35,14 @@ class DatabaseBooks(object):
         except: return False
 
 
-    def getRecordsDb(self, id_record=None):
-        
+    def getRecordsDb(self, columns_str="", id_record=None):
+
         if id_record:
-            query = "SELECT * FROM livros WHERE id={}".format(id_record)
+            query = "SELECT {} FROM livros WHERE id={}".format(columns_str, id_record)
             self.execute(query)
             result = self.cursor.fetchall()[0]
         else:
-            query = "SELECT * FROM livros"
+            query = "SELECT {} FROM livros".format(columns_str)
             self.execute(query)
             result = self.cursor.fetchall()
         return result
@@ -75,7 +75,7 @@ class DatabaseBooks(object):
         except Exception("Erro ao inserir registro no banco de dados"):
             print query
             return False
-        
+
     def getCategoriesAmountDb(self):
         query = "select categoria, count(*) from livros group by categoria order by count(*) desc"
         self.execute(query)
@@ -101,12 +101,12 @@ class DatabaseBooks(object):
         if category:
             query = """select sum(pagina_pausada - inicio_leitura) as paginas_lidas, categoria,
 (sum(pagina_pausada - inicio_leitura) * 100) / sum(total_paginas - inicio_leitura) as porcentagem_lida
- from livros group by categoria"""
+ from livros group by categoria order by paginas_lidas desc"""
 
         else:
             query = """select sum(pagina_pausada - inicio_leitura) as paginas_lidas, categoria,
 (sum(pagina_pausada - inicio_leitura) * 100) / sum(total_paginas - inicio_leitura) as porcentagem_lida
- from livros where categoria='{}'' group by categoria""".format(category)
+ from livros where categoria='{}'' group by categoria order by paginas_lidas desc""".format(category)
 
         self.execute(query)
         return self.fetchall()
