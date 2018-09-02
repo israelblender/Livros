@@ -1,5 +1,6 @@
-# -*- coding: Latin-1 -*-
+# -*- coding: Utf-8 -*-
 
+execfile('ambiente27clean/scripts/activate_this.py', dict(__file__='ambiente27clean/scripts/activate_this.py'))
 #import Tkinter as tk
 from Tkinter import Frame, Tk, LEFT, RIGHT, TOP, BOTTOM, Label, W, E, StringVar, IntVar, Button, Entry, Menu
 from ttk import Combobox, Style
@@ -23,7 +24,7 @@ class AreaMenu():
         menuBar.add_cascade(label="Ajustes", menu=ajustesMenu)
         menuBar.add_cascade(label="Sobre", menu=sobreMenu)
         
-        iniciarMenu.add_command(label="Criar usu·rio")#, command=confComando.tituloAplicativo)
+        iniciarMenu.add_command(label="Criar usu√°rio")#, command=confComando.tituloAplicativo)
         
         sobreMenu.add_command(label="Desenvolvedor")
 
@@ -65,10 +66,10 @@ class PanelInfo:
         self.daysRestVar = StringVar()
         
         Label(painelTopInfo, text="Total de livros:").grid(row=0, column=0, stick=W)
-        Label(painelTopInfo, text="Total de p·ginas sem sum·rios:").grid(row=1, column=0, stick=W)
-        Label(painelTopInfo, text="Total de p·ginas lidas:").grid(row=2, column=0, stick=W)
-        Label(painelTopInfo, text="Total de p·ginas n„o lidas:").grid(row=3, column=0, stick=W)
-        Label(painelTopInfo, text="MÈdia de p·ginas em cada livro:").grid(row=4, column=0, stick=W)
+        Label(painelTopInfo, text="Total de p√°ginas com conte√∫do:").grid(row=1, column=0, stick=W)
+        Label(painelTopInfo, text="Total de p√°ginas lidas:").grid(row=2, column=0, stick=W)
+        Label(painelTopInfo, text="Total de p√°ginas n√£o lidas:").grid(row=3, column=0, stick=W)
+        Label(painelTopInfo, text="M√©dia de p√°ginas em cada livro:").grid(row=4, column=0, stick=W)
         
         Label(painelTopInfo, textvariable=self.totalBooksVar).grid(row=0, column=1, stick=E)
         Label(painelTopInfo, textvariable=self.totalPagesVar).grid(row=1, column=1, stick=E)
@@ -90,12 +91,12 @@ class PanelInfo:
         inputDateFrame = Frame(painelBottomInfo)#Contem todos os Labels e Entrys
         inputDateFrame.pack(side=TOP)
         
-        showMediaPagesDayFrame = Frame(painelBottomInfo)#Contem os Labels de exibiÁ„o de resultado
+        showMediaPagesDayFrame = Frame(painelBottomInfo)#Contem os Labels de exibi√ß√£o de resultado
         showMediaPagesDayFrame.pack(side=TOP)
 
         Label(inputDateFrame, text="Dia").grid(row=0, column=0, stick=W)
         Entry(inputDateFrame, textvariable=self.finalDayVar, width=3).grid(row=0, column=1, stick=E, padx=2)
-        Label(inputDateFrame, text="MÍs").grid(row=0, column=2, stick=W)
+        Label(inputDateFrame, text="M√™s").grid(row=0, column=2, stick=W)
         Entry(inputDateFrame, textvariable=self.finalMonthVar, width=3).grid(row=0, column=3, stick=E, padx=2)
         Label(inputDateFrame, text="Ano").grid(row=0, column=4, stick=W)
         Entry(inputDateFrame, textvariable=self.finalYearVar, width=5).grid(row=0, column=5, stick=E, padx=2)
@@ -111,11 +112,11 @@ class PanelInfo:
         days_rest = self.getDaysRest({"day": 31, "month": 12, "year": 2018})
         totalBooks = self.book.getTotalBooks()
 
-        totalPages = self.book.getTotalPages()
+        totalPages = self.book.getTotalPagesContent()
         totalPagesReads = self.book.getTotalPagesReads()
         totalPagesNotReads = self.book.getTotalPagesNotReads()
         self.setDaysRestLabel(days_rest)
-        mediaPagesDay = self.book.getMediaPagesDay(totalPagesNotReads, days_rest)#Retorna a media de p·ginas por dia
+        mediaPagesDay = self.book.getMediaPagesDay(totalPagesNotReads, days_rest)#Retorna a media de p√°ginas por dia
 
         self.totalBooksVar.set(totalBooks)
         self.totalPagesVar.set(totalPages)

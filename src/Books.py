@@ -1,40 +1,72 @@
-# -*- coding: Latin-1 -*-
+# -*- coding: Utf-8 -*-
 
 from Database import DatabaseBooks
 import datetime
+from collections import namedtuple
 
 class Books(DatabaseBooks):
     def __init__(self):
         super(Books, self).__init__()
         #self.db = DatabaseBooks()
-        self.books = self.getRecords()
+        self.books = self.getRecordsDb()
         self._totalPages = None
         self._totalPagesNotReads = None
+
     def getAllBooks(self):
+        "Retorna a informacao completa de cada livro"
         return self.books
+
     def getTotalPagesReads(self):
-        if not self._totalPages: self._totalPages = self.getTotalPages()
-        if not self._totalPagesNotReads: self.getTotalPagesNotReads()
-        return self._totalPages - self._totalPagesNotReads
+        "Retorna o total de paginas lidas"
+        return self.getTotalPagesReadDb()
     
-    def getTotalPages(self):
-        self._totalPages = sum([element[2]-element[4] for element in self.books])
+    def getTotalPagesContent(self):
+        "Retorna o total de paginas com conteudo que podem ser lidas"
+        self._totalPages = self.getTotalPagesContentDb()
         return self._totalPages
 
     def getTotalPagesNotReads(self):
-        self._totalPagesNotReads = sum([element[2]-element[3]-element[4] for element in self.books])
+        "Retorna o total de paginas nao lidas"
+        print (self.getTotalPagesNotReadDb())
+        self._totalPagesNotReads = self.getTotalPagesNotReadDb()
         return self._totalPagesNotReads
 
     def getTotalBooks(self):
-        self._totalBooks = self.getSizeRecords()
+        "Retorna o total de livros registrados"
+        self._totalBooks = self.getAmountBooksDb()
         return self._totalBooks
 
+    def getCategoriesAmount(self):
+        return self.getCategoriesAmount()
+
     def getMediaPagesDay(self, totalPages, days):
-        if totalPages % 2 != 0:  totalPages -= 1
+        "Retorna a media de paginas que devem ser lidas por dia"
+        #if totalPages % 2 != 0:  totalPages -= 1
         pagesPerDay = totalPages / days #Total de páginas para ler por dia
         totalPagesCheck = days * pagesPerDay#Total de páginas para ler em x(number_of_months) meses
         #restDays = totalPages - totalPagesCheck#Resto das páginas para realizar a leitura
         return pagesPerDay
+
+    def getCategoriesAmount(self):
+        "Retorna quantidade de livros classificados em cada categoria"
+        return self.getCategoriesAmountDb()
+
+    def getPercentReadBook(self, book_id):
+        "Retorna o percentual de leitura do livro informado"
+        return self.getPercentReadBooksDb(book_id)
+
+    def getPercentReadAllBooks(self):
+        "Retorna o progresso de todos os livros"
+        return self.getPercentBooksDb()
+
+    def getPercentReadCategories(self, category):
+        "Retorna o percentual de livros lidos na categoria informada"
+        return self.getPercentReadCategoriesDb(category)
+
+    def getPercentReadCategories(self):
+        "Retorna o percentual de livros lidos em cada categoria"
+        return self.getPercentReadCategoriesDb()
+
 
 if __name__ == "__main__":
     b = Books()
@@ -44,14 +76,14 @@ if __name__ == "__main__":
     days_rest = days_rest.days
     
     totalBooks = b.getTotalBooks()
-    totalPages = b.getTotalPages()
+    totalPages = b.getTotalPagesContent()
     totalPagesReads = b.getTotalPagesReads()
     totalPagesNotReads = b.getTotalPagesNotReads()
     mediaPagesDay = b.getMediaPagesDay(totalPagesNotReads, days_rest)
     
     print ("""
     Total de livros: \t\t\t{}
-    Total de páginas sem sumários: \t{}
+    Total de páginas com conteúdo: \t{}
     Total de páginas lidas: \t\t{}
     Total de páginas não lidas: \t{}
     Média de páginas em cada livro: \t{:.0f}
