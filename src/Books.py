@@ -16,8 +16,8 @@ class Books(DatabaseBooks):
         return self.getRecordsDb(columns_str=columns_str)
 
     def getBook(self, columns_str, id_record):
-        "Retorna a informacao completa dolivro"
-        return self.getRecordsDb(columns_str=columns_str, id_record=id_record)
+        "Retorna a informacao completa do livro"
+        return self.getRecordsDb(columns_str=columns_str, id_record=id_record)[0]
 
     def getTotalPagesReads(self):
         "Retorna o total de paginas lidas"
@@ -56,7 +56,7 @@ class Books(DatabaseBooks):
 
     def getPercentReadBook(self, book_id):
         "Retorna o percentual de leitura do livro informado"
-        return self.getPercentReadBooksDb(book_id)
+        return self.getPercentReadBooksDb(book_id)[0]
 
     def getPercentReadAllBooks(self):
         "Retorna o progresso de todos os livros"
@@ -69,6 +69,10 @@ class Books(DatabaseBooks):
     def getPercentReadCategories(self):
         "Retorna o percentual de livros lidos em cada categoria"
         return self.getPercentReadCategoriesDb()
+
+    def updatePagePaused(self, book_id, page_paused):
+        "Atualiza a página atual do marcador"
+        self.updatePagePausedDb(book_id, page_paused)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-# -*- coding: Latin-1 -*-
+# -*- coding: Utf-8 -*-
 import sqlite3
 import os
 
@@ -40,7 +40,7 @@ class DatabaseBooks(object):
         if id_record:
             query = "SELECT {} FROM livros WHERE id={}".format(columns_str, id_record)
             self.execute(query)
-            result = self.cursor.fetchall()[0]
+            result = self.cursor.fetchall()
         else:
             query = "SELECT {} FROM livros".format(columns_str)
             self.execute(query)
@@ -83,13 +83,13 @@ class DatabaseBooks(object):
 
     def getPercentReadBooksDb(self, book_id):
         if book_id:
-            query = """select id, nome, 
+            query = """select 
             ((100*(pagina_pausada-inicio_leitura)) / (total_paginas-inicio_leitura)) as porcentagem_lida from livros
              where id = {}
              order by porcentagem_lida desc
             """.format(book_id)
         else:
-            query = """select id, nome, 
+            query = """select 
             ((100*(pagina_pausada-inicio_leitura)) / (total_paginas-inicio_leitura)) as porcentagem_lida from livros
              order by porcentagem_lida desc
             """
@@ -110,6 +110,12 @@ class DatabaseBooks(object):
 
         self.execute(query)
         return self.fetchall()
+
+    def updatePagePausedDb(self, book_id, page_paused):
+        "Atualiza a pagina pausada"
+        query = "update livros set pagina_pausada={} where id={}".format(page_paused, book_id)
+        self.execute(query)
+        self.db.commit()
         
         
     def close(self):

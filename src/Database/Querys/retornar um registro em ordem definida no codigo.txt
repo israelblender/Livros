@@ -1,0 +1,1 @@
+select id, nome from arquivos where tipo='.pdf' order by id asc limit 1 offset 500

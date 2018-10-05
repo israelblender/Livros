@@ -1,0 +1,1 @@
+select path, count(path) as n_ocorrencias from arquivos where nome like '%rápido%' group by path order by n_ocorrencias desc
