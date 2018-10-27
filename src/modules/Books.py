@@ -42,12 +42,12 @@ class Books(DatabaseBooks):
     def getCategoriesAmount(self):
         return self.getCategoriesAmount()
 
-    def getMediaPagesDay(self, totalPages, days):
+    def getMediaPagesDay(self, total_pages, days):
         "Retorna a media de paginas que devem ser lidas por dia"
-        #if totalPages % 2 != 0:  totalPages -= 1
-        pagesPerDay = totalPages / days #Total de páginas para ler por dia
+        #if total_pages % 2 != 0:  total_pages -= 1
+        pagesPerDay = total_pages / days #Total de páginas para ler por dia
         totalPagesCheck = days * pagesPerDay#Total de páginas para ler em x(number_of_months) meses
-        #restDays = totalPages - totalPagesCheck#Resto das páginas para realizar a leitura
+        #restDays = total_pages - totalPagesCheck#Resto das páginas para realizar a leitura
         return pagesPerDay
 
     def getCategoriesAmount(self):
@@ -73,6 +73,15 @@ class Books(DatabaseBooks):
     def updatePagePaused(self, book_id, page_paused):
         "Atualiza a página atual do marcador"
         self.updatePagePausedDb(book_id, page_paused)
+
+    def saveNewBook(self, book_name, author, year, category, total_pages, start_read):
+        "Salva um novo livro"
+        self.saveNewBookDb(book_name, author, year, category, total_pages, start_read, path="")
+
+    def updateBook(self, book_id, book_name, author, year, category, total_pages, start_read):
+        "Atualiza as informações do livro existente"
+        self.updateBookDb(book_id, book_name, author, year, category, total_pages, start_read, path="")
+        
 
 
 if __name__ == "__main__":

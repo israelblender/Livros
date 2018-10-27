@@ -48,12 +48,13 @@ class Table(object, tk.Frame, Binds):
     _idBindMouse = None
     frameCelulas = []
     canvas = None
-    def __new__(cls, *args, **kwargs):
+    def __new__(self, *args, **kwargs):
         if not hasattr(Table, "_instance"):
-                cls._instance = super(Table, cls).__new__(cls, *args, **kwargs)
-        return cls._instance
-        
-    def __init__(self, master, headers, **kwargs):
+                self._instance = super(Table, self).__new__(self, *args, **kwargs)
+        return self._instance
+
+    def __init__(self, master, headers, find_field="namebook", **kwargs):
+    	self.find_field = find_field
         tk.Frame.__init__(self, master, cnf=kwargs)
         Binds.__init__(self)
         #BindTable.__init__(self)
@@ -89,6 +90,8 @@ class Table(object, tk.Frame, Binds):
         self.configColors(bg="#B4CDCD", bg_header="#68838B")
         self.configHeader(headers)
         self._unique_id_selected = None
+        self.fields_widgets = {}#Todos os widgets classificados por find_field
+        self.rows_forgets = []
             
     def configHeader(self, headers):
         self.headers = headers
@@ -105,8 +108,11 @@ class Table(object, tk.Frame, Binds):
             self.canvas.yview_scroll(1, tk.UNITS)
         elif event.delta > 0: #Move para baixo
             self.canvas.yview_scroll(-1, tk.UNITS)
+
+    def actionPageUp(self):
+    	self.canvas.yview_scroll(-1000, tk.UNITS)
     
-    def updateRegion(self):#Atualiza a regi„o para que o scroll se encaixe no quadro da tabela
+    def updateRegion(self):#Atualiza a regi√£o para que o scroll se encaixe no quadro da tabela
         Table.frameCelulas.update()
         self.canvas.config(scrollregion=(0, 0, Table.frameCelulas.winfo_width(), Table.frameCelulas.winfo_height()))#Atualiza scroll x e y para o tamanho da tabela
         
@@ -125,7 +131,6 @@ class Table(object, tk.Frame, Binds):
     
     def insertLine(self, unique_id, elements, type):
         col = 0
-        
         if type == "cel":
             for index in range(len(elements)):
                 idname = self.dict_idname_colname.get(index)[0]
@@ -136,6 +141,7 @@ class Table(object, tk.Frame, Binds):
                     value = elements.get(idname),
                     background=self._colorBgPatern)
                 self._addBinds(widget=cel)
+                self.fields_widgets[self.row] = elements.get(self.find_field)
                 col += 1
         elif type == "header":
             for index in range(len(elements)):
@@ -150,6 +156,28 @@ class Table(object, tk.Frame, Binds):
                 col += 1
         self.row += 1
     
+    def _showAllRows(self):
+    	for row_forget in self.rows_forgets:
+    		for widget, row, column in row_forget:
+    			widget.grid(row=row, column=column)
+        self.rows_forgets = []
+
+    def hiddenRowsWithWord(self, word):
+        self._showAllRows()
+        return map(lambda row:self._grid_forget(word, row), self.fields_widgets)
+
+    def _grid_forget(self, word, row):
+        #print row, self.fields_widgets.get(row), word.lower() in self.fields_widgets.get(row)
+        if not word.lower() in self.fields_widgets.get(row):
+            widgets_row = []
+            for widget in Table.frameCelulas.grid_slaves(row=row):
+                
+                widgets_row.append((widget, widget.grid_info()["row"], widget.grid_info()["column"]))
+                widget.grid_forget()
+            #print "row", row, word.lower() in self.fields_widgets.get(row), word.lower(), self.fields_widgets.get(row)
+            self.rows_forgets.append(widgets_row)
+        #print self.rows_forgets
+
     def _insertCelula(self, row, col, unique_id, width, value="", **cnf):
         cel = tk.Label(Table.frameCelulas, width=width, text=value, cnf=cnf)
         cel.grid(row=row, column=col)
@@ -158,26 +186,29 @@ class Table(object, tk.Frame, Binds):
         return cel
         
     def selectRowEvent(self, events, unique_id):
-        self._unique_id_selected = unique_id#events.widget.unique_id
-        print "UNIQUEID: ", unique_id
-        widget = events.widget
-        #self.rowSelected = widget.grid_info().get("row")
-        self.selectRowByNumberLine(row = int(widget.grid_info().get("row")) )
+
+        if unique_id >=0:
+            self._unique_id_selected = unique_id#events.widget.unique_id
+            #print "UNIQUEID: ", unique_id
+            widget = events.widget
+            #self.rowSelected = widget.grid_info().get("row")
+            self.selectRowByNumberLine(row = int(widget.grid_info().get("row")) )
     
     def selectPreviousRowEvent(self, events, unique_id=None):
-        """FunÁ„o para selecionar a linha antecessora acima acionada por um evento"""
-        self._unique_id_selected = unique_id
-        print "UNIQUEID: ", unique_id
-        self.selectRowByNumberLine( row = Table.rowCurrent - 1 )
+        "Fun√ß√£o para selecionar a linha antecessora acima acionada por um evento"
+        if unique_id >=0:
+            self._unique_id_selected = unique_id
+            #print "UNIQUEID: ", unique_id
+            self.selectRowByNumberLine( row = Table.rowCurrent - 1 )
         
     def selectNextRowEvent(self, events, unique_id=None):
-        """FunÁ„o para selecionar a proxima linha abaixo acionada por um evento"""
-        self._unique_id_selected = unique_id
-        print "UNIQUEID: ", unique_id
-        self.selectRowByNumberLine( row = Table.rowCurrent + 1 )
+        "Fun√ß√£o para selecionar a proxima linha abaixo acionada por um evento"
+        if unique_id >=0:
+            self._unique_id_selected = unique_id
+            #print "UNIQUEID: ", unique_id
+            self.selectRowByNumberLine( row = Table.rowCurrent + 1 )
     
     def selectRowByNumberLine(self, row):
-
         #widgetsInLine = widget.grid_info().get("in").grid_slaves(row=row)
         self._diselectLastWidgetsBackgroundColors() #Se nao for a primeira selecao, diselecione os ultimos widgets selecionados
         Table.rowCurrent = row # Obtem a linha atual
@@ -260,27 +291,27 @@ if __name__ == "__main__":
     table.bind("<Button-1>", table.selectRowEvent)
     table.bind("<Button-3>", callWindowEditEvent)
     
-    table.insertRow(unique_id=5, elements={"id": "5", "name": "Alguma pessoa", "old":"18"})
-    table.insertRow(unique_id=12, elements={"id": "12","name": "Fulano","old":"15"})
-    table.insertRow(unique_id=14, elements={"id": "14","name": "Ciclano","old":"22"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
-    table.insertRow(unique_id=18, elements={"id": "18","name": "Beltrano","old":"26"})
+    table.insertRow(unique_id=1, elements={"id": "1", "name": "fernando", "old":"18"})
+    table.insertRow(unique_id=2, elements={"id": "2","name": "Fulano","old":"15"})
+    table.insertRow(unique_id=3, elements={"id": "3","name": "Ciclano","old":"22"})
+    table.insertRow(unique_id=4, elements={"id": "4","name": "florinda","old":"26"})
+    table.insertRow(unique_id=5, elements={"id": "5","name": "carlos","old":"26"})
+    table.insertRow(unique_id=6, elements={"id": "6","name": "joana","old":"26"})
+    table.insertRow(unique_id=7, elements={"id": "7","name": "fernanda","old":"26"})
+    table.insertRow(unique_id=8, elements={"id": "8","name": "andrea","old":"26"})
+    table.insertRow(unique_id=9, elements={"id": "9","name": "jose","old":"26"})
+    table.insertRow(unique_id=10, elements={"id": "10","name": "maria","old":"26"})
+    table.insertRow(unique_id=11, elements={"id": "11","name": "amanda","old":"26"})
+    table.insertRow(unique_id=12, elements={"id": "12","name": "geovane","old":"26"})
+    table.insertRow(unique_id=13, elements={"id": "13","name": "jetulia","old":"26"})
+    table.insertRow(unique_id=14, elements={"id": "14","name": "lucas","old":"26"})
+    table.insertRow(unique_id=15, elements={"id": "15","name": "anderson","old":"26"})
+    table.insertRow(unique_id=16, elements={"id": "16","name": "cleide","old":"26"})
+    table.insertRow(unique_id=17, elements={"id": "17","name": "emily","old":"26"})
+    table.insertRow(unique_id=18, elements={"id": "18","name": "ana maria","old":"26"})
+    table.insertRow(unique_id=19, elements={"id": "19","name": "concei√ß√£o","old":"26"})
+    table.insertRow(unique_id=20, elements={"id": "20","name": "francisca","old":"26"})
+    table.insertRow(unique_id=21, elements={"id": "21","name": "Nando","old":"26"})
     table.updateRegion()
     #table.bind("<Up>", table.selectPreviousRowEvent)
     table.bind("<Up>", table.selectPreviousRowEvent, "only", action="up")

@@ -81,12 +81,11 @@ class DatabaseBooks(object):
         self.execute(query)
         return self.fetchall()
 
-    def getPercentReadBooksDb(self, book_id):
-        if book_id:
+    def getPercentReadBooksDb(self, book_id=None):
+        if book_id != None:
             query = """select 
             ((100*(pagina_pausada-inicio_leitura)) / (total_paginas-inicio_leitura)) as porcentagem_lida from livros
              where id = {}
-             order by porcentagem_lida desc
             """.format(book_id)
         else:
             query = """select 
@@ -116,7 +115,25 @@ class DatabaseBooks(object):
         query = "update livros set pagina_pausada={} where id={}".format(page_paused, book_id)
         self.execute(query)
         self.db.commit()
-        
+
+    def saveNewBookDb(self, book_name, author, year, category, total_pages, start_read, path):
+        "Salva um novo livro"
+        query = """
+        INSERT INTO livros(nome, autor, ano, categoria, total_paginas, pagina_pausada, inicio_leitura, caminho_imagem)       
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        self.execute(query, (book_name, author, year, category, total_pages, start_read, start_read, path))
+        self.db.commit()
+
+    def updateBookDb(self, book_id, book_name, author, year, category, total_pages, start_read, path):
+        "Atualiza as informações de livro existente"
+        query = """
+        UPDATE livros SET nome=?, autor=?, ano=?, categoria=?, total_paginas=?, 
+        pagina_pausada=?, inicio_leitura=?, caminho_imagem=?    
+        WHERE id=?
+        """
+        self.execute(query, (book_name, author, year, category, total_pages, start_read, start_read, path, book_id))
+        self.db.commit()
         
     def close(self):
         self.db.close()
