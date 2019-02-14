@@ -13,3 +13,5 @@ Tecnologias utilizadas:
 [Sqlite3]
 
 Utilize-a para fins didáticos.
+
+Para execução, execute o commando: python main.py
