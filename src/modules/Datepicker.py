@@ -54,7 +54,9 @@ class Calendar(ttk.Frame):
     datetime = calendar.datetime.datetime
     timedelta = calendar.datetime.timedelta
 
-    def __init__(self, master=None, year=None, month=None, firstweekday=calendar.MONDAY, locale=None, activebackground='#b1dcfb', activeforeground='black', selectbackground='#003eff', selectforeground='white', command=None, borderwidth=1, relief="solid", on_click_month_button=None):
+    def __init__(self, master=None, year=None, month=None, firstweekday=calendar.MONDAY, 
+        locale=None, activebackground='#b1dcfb', activeforeground='black', selectbackground='#003eff', 
+        selectforeground='white', command=None, borderwidth=1, relief="solid", on_click_month_button=None):
         """
         WIDGET OPTIONS
 

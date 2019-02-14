@@ -144,15 +144,16 @@ class PanelTable:
         "Atualizar informacoes do livro"
         id_line_selected = self.table.getIdSelected()
         if id_line_selected >= 0:
-            ChangeBookGui(self.master, self.book, id_line_selected)
+            ChangeBookGui(self.master, self.book, id_line_selected, x=self.master.winfo_rootx()+200, y=self.master.winfo_rooty())
 
     def actionWindowEditMarker(self):
         "Atualizar a pagina atual do marcador"
+
         id_line_selected = self.table.getIdSelected()
 
         if id_line_selected >= 0:
             print "ActionWindowEdit", self.master
-            PageMarkerGui(self.master, self.book, id_line_selected)
+            PageMarkerGui(self.master, self.book, id_line_selected, x=self.master.winfo_rootx()+200, y=self.master.winfo_rooty())
         else: print "Id not selected" 
 
     

@@ -20,16 +20,15 @@ def getDaysRest(date_final_dict):#Calcula a quantidade de dias que faltam para l
 
 
 class PageMarkerGui:
-	def __init__(self, master, book, id_line_selected):
+	def __init__(self, master, book, id_line_selected, x=0, y=0):
 		self.book = book
 		self.id_line_selected = id_line_selected
 
 		if master:
 			topwindow = Toplevel(master)
 			topwindow.title("Marcador de página")
-	        #topwindow.geometry("400x150+150+150")
+        	topwindow.geometry("+{}+{}".format(x, y))
 	        topwindow.maxsize(500, 270)
-
 	        topwindow.transient(master)
 	        
 	        self.labelNameBookVar = StringVar(master)
@@ -64,7 +63,6 @@ class PageMarkerGui:
 	        self.progress.pack(fill=X)
 	        
 	        
-
 	        Separator(topwindow).pack(side=TOP, fill=X)
 
 	        panelDown = Frame(topwindow)
@@ -93,7 +91,7 @@ class PageMarkerGui:
 		self.inputPagePaused.config(from_=self.start_read, to=self.total_pages)
 		self.progressVar.set(percent)
 
-		print self.progressVar.get()
+		#print self.progressVar.get()
 		
 		#self.labelProgress.config(text=)
 
@@ -106,7 +104,6 @@ class PageMarkerGui:
 		    self.topwindow.destroy()
 		else:
 		    tkmsg.showwarning("Alerta", u"Não é possível salvar o campo vazio")
-
 
 class InputBookGui:
 	def __init__(self, master, title):
@@ -176,11 +173,13 @@ class InputBookGui:
 	    self.inputNameBook.focus_force()
 
 class AddBookGui(InputBookGui):
-	def __init__(self, master, book):
+	def __init__(self, master, book, x=0, y=0):
 		self.master = master
 		self.book = book
 		if master:
 			InputBookGui.__init__(self, master, title="Novo Livro")
+			self.topwindow.geometry("+{}+{}".format(x, y))
+
 			self.setValuesDefaults()
 			self.configCommandSave(self.actionSaveNewBook)
 
@@ -198,12 +197,15 @@ class AddBookGui(InputBookGui):
 		    tkmsg.showwarning("Alerta", u"Informe o nome do livro para continuar.")
 
 class ChangeBookGui(InputBookGui):
-	def __init__(self, master, book, id_selected):
+	def __init__(self, master, book, id_selected, x=0, y=0):
 		self.master = master
 		self.book = book
 		self.id_selected = id_selected
 
 		InputBookGui.__init__(self, master, title="Alterar Livro")
+		print x, y
+		self.topwindow.geometry("+{}+{}".format(x, y))
+
 		self.focusFirstField()
 		self.setValuesFields()
 		self.configCommandSave(self.actionUpdateBook)
